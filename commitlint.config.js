@@ -14,6 +14,7 @@ module.exports = {
       'lint',
       'lib',
       'cli',
+      'changeset',
       'cli/docs',
       'lib/parser',
       'lib/domain',
