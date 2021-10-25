@@ -5,10 +5,15 @@
   "description": "Workspace for datever, a date-based version parser, inspired by semver.",
   "scripts": {
     "prepare": "pnpm run init:dev",
-    "init:dev": "is-ci || husky install",
-    "postinstall": "node scripts/bin/instantiate-samples.js"
+    "postinstall": "pnpm run init:dev",
+    "init:dev": "pnpm run init:dev:husky && pnpm run init:dev:samples",
+    "init:dev:husky": "is-ci || husky install",
+    "init:dev:samples": "node scripts/bin/instantiate-samples.js",
+    "ci:version": "pnpm run -r ci:build:version && changeset version",
+    "ci:publish": "pnpm run -r ci:build:publish && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.17.0",
     "commitlint": "^13.2.1",
     "husky": "^7.0.2",
     "is-ci": "^3.0.0",

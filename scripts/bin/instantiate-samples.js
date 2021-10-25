@@ -17,7 +17,10 @@ function slugifyFsPath(value) {
   return value.replace(/[^\w_\-\+\~\^,.\s]/g, '_');
 }
 
-function createSimpleParser(reSubst, { replaceFallback, replaceTransform } = {}) {
+function createSimpleParser(
+  reSubst,
+  { replaceFallback, replaceTransform } = {}
+) {
   return (contents, context) => {
     const originalPath = String(contents);
     let remainingPath = originalPath;
@@ -29,7 +32,9 @@ function createSimpleParser(reSubst, { replaceFallback, replaceTransform } = {})
       matchCount += 1;
       const expression = captures[0];
       const valuePrefix = remainingPath.substring(0, captures.index);
-      remainingPath = remainingPath.substring(captures.index + expression.length);
+      remainingPath = remainingPath.substring(
+        captures.index + expression.length
+      );
 
       const pathExpression = captures[1];
       const contextPath = parseObjectPath(pathExpression);
@@ -39,28 +44,42 @@ function createSimpleParser(reSubst, { replaceFallback, replaceTransform } = {})
         contextValue = navigateObject(context, contextPath);
       } catch (error) {
         if (typeof replaceFallback === 'function') {
-          contextValue = replaceFallback({ context, contextPath, expression, pathExpression, error });
+          contextValue = replaceFallback({
+            context,
+            contextPath,
+            expression,
+            pathExpression,
+            error,
+          });
         } else {
           throw error;
         }
       }
 
-      const substituteValue = replaceTransform ? replaceTransform(contextValue) : contextValue;
+      const substituteValue = replaceTransform
+        ? replaceTransform(contextValue)
+        : contextValue;
       parsedPath = parsedPath + valuePrefix + substituteValue;
     }
-    const finalPath = matchCount === 0 ? originalPath : parsedPath + remainingPath;
+    const finalPath =
+      matchCount === 0 ? originalPath : parsedPath + remainingPath;
     return finalPath;
   };
 }
 
-const deduceDestinationFilename = createSimpleParser(/(?<!\[)\[{2}([^\[\]]+)\]{2}(?!\])/, {
-  replaceTransform: slugifyFsPath,
-});
+const deduceDestinationFilename = createSimpleParser(
+  /(?<!\[)\[{2}([^\[\]]+)\]{2}(?!\])/,
+  {
+    replaceTransform: slugifyFsPath,
+  }
+);
 
 const replaceEnvVars = createSimpleParser(/(?<!\\)\$\{([^}]+)\}/m, {
   replaceFallback: ({ expression, error }) => {
     const message = getErrorMessage(error);
-    console.warn(`*** [SAMPLE] Failed to substitute expression "${expression}"; Reason: ${message}`);
+    console.warn(
+      `*** [SAMPLE] Failed to substitute expression "${expression}"; Reason: ${message}`
+    );
     return expression;
   },
 });
@@ -71,9 +90,14 @@ const copyProcessor = async (src, dst, _options = {}) => {
 };
 
 const envFileProcessor = async (src, dst, { context }) => {
-  console.log(`*** [SAMPLE] Generating env-var-substituted file: "${src}" -> "${dst}"`);
+  console.log(
+    `*** [SAMPLE] Generating env-var-substituted file: "${src}" -> "${dst}"`
+  );
   const srcContents = fs.readFileSync(src, { encoding: 'utf-8' });
-  const dstContents = replaceEnvVars(srcContents, context).replace(/\\\$\{/g, '${');
+  const dstContents = replaceEnvVars(srcContents, context).replace(
+    /\\\$\{/g,
+    '${'
+  );
   fs.writeFileSync(dst, dstContents);
 };
 
@@ -89,24 +113,25 @@ const PROJECT_ROOT_DIR = path.resolve(__dirname, '..', '..');
 const defaultRoots = [
   PROJECT_ROOT_DIR,
   path.resolve(PROJECT_ROOT_DIR, '.vscode'),
-  ...['dbvolve', 'dbvolve-cli'].map(projectName => [
-    path.resolve(PROJECT_ROOT_DIR, 'packages', projectName),
-    path.resolve(PROJECT_ROOT_DIR, 'packages', projectName, '.vscode'),
-  ]),
+  ...['dbvolve', 'dbvolve-cli'].reduce(
+    (result, projectName) =>
+      result.concat([
+        path.resolve(PROJECT_ROOT_DIR, 'packages', projectName),
+        path.resolve(PROJECT_ROOT_DIR, 'packages', projectName, '.vscode'),
+      ]),
+    []
+  ),
 ];
 
 function createContext() {
   const envName = process.env.APP_ENV || process.env.NODE_ENV || defaultEnvName;
 
-  const context = Object.assign(
-    Object.create(process.env),
-    {
-      envName,
-      env: {
-        name: envName,
-      },
+  const context = Object.assign(Object.create(process.env), {
+    envName,
+    env: {
+      name: envName,
     },
-  );
+  });
 
   return context;
 }
@@ -133,11 +158,15 @@ function parseObjectPath(path) {
 function navigateObject(obj, path) {
   let current = obj;
   path.forEach((propertyName, index, array) => {
-    const isLast = index === (array.length - 1);
+    const isLast = index === array.length - 1;
     current = current[propertyName];
     const isObject = isObjectLike(current);
     if (!isLast && !isObject) {
-      throw new Error(`The navigation for path ${JSON.stringify(path)} terminated prematurely.`);
+      throw new Error(
+        `The navigation for path ${JSON.stringify(
+          path
+        )} terminated prematurely.`
+      );
     }
   });
   if (current === undefined) {
@@ -181,14 +210,20 @@ async function main() {
       let dst, deducedBasename;
 
       try {
-        console.debug(`*** [SAMPLE] In root "${root}": Found source file "${src}"`);
+        console.debug(
+          `*** [SAMPLE] In root "${root}": Found source file "${src}"`
+        );
         const dstBasename = path.basename(fsEntry.name, sampleExt);
         deducedBasename = deduceDestinationFilename(dstBasename, context);
-        console.debug(`*** [SAMPLE] In root "${root}": Deduced destination file basename "${dstBasename}" -> "${deducedBasename}"`);
+        console.debug(
+          `*** [SAMPLE] In root "${root}": Deduced destination file basename "${dstBasename}" -> "${deducedBasename}"`
+        );
         dst = path.resolve(root, deducedBasename);
       } catch (err) {
         const message = getErrorMessage(err);
-        console.error(`*** [SAMPLE] ERROR: Could not deduce destination filename for source "${src}"! Reason: ${message}`);
+        console.error(
+          `*** [SAMPLE] ERROR: Could not deduce destination filename for source "${src}"! Reason: ${message}`
+        );
         continue;
       }
 
@@ -197,7 +232,9 @@ async function main() {
         continue;
       }
 
-      const processorConfig = processorConfigs.find(({ test }) => test.test(deducedBasename));
+      const processorConfig = processorConfigs.find(({ test }) =>
+        test.test(deducedBasename)
+      );
       const processor = processorConfig?.processor || copyProcessor;
       await processor(src, dst, { context });
     }

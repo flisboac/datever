@@ -6,7 +6,11 @@
   "module": "dist/module/src/lib/index.js",
   "browser": "dist/browser/index.js",
   "typesVersions": {
-    ">=3.1": { "*": ["dist/module/src/lib/index.d.ts"] }
+    ">=3.1": {
+      "*": [
+        "dist/module/src/lib/index.d.ts"
+      ]
+    }
   },
   "engines": {
     "node": "14",
@@ -26,13 +30,12 @@
     "README.md"
   ],
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.1",
     "@commitlint/config-conventional": "^13.2.0",
-    "@release-it/conventional-changelog": "^3.3.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
-    "commitlint": "^13.2.1",
     "cross-env": "^7.0.3",
     "doctoc": "^2.1.0",
     "dotenv-cli": "^4.0.0",
@@ -42,13 +45,10 @@
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^7.0.2",
     "jest": "^27.3.1",
     "jest-coverage-badges": "^1.1.2",
-    "lint-staged": "^11.2.3",
     "peggy": "^1.2.0",
     "prettier": "^2.4.1",
-    "release-it": "^14.11.6",
     "repository-check-dirty": "^3.1.1",
     "shelljs": "^0.8.4",
     "shx": "^0.3.3",
@@ -61,37 +61,32 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "npm run build:parser && npm run build:main && npm run build:module && npm run build:browser",
+    "build": "pnpm run build:parser && pnpm run build:main && pnpm run build:module && pnpm run build:browser",
     "build:main": "tsc -p tsconfig.main.json && tsconfig-replace-paths -p tsconfig.main.json -s . -o dist/main",
     "build:module": "tsc -p tsconfig.module.json && tsconfig-replace-paths -p tsconfig.module.json -s . -o dist/module",
     "build:browser": "esbuild dist/module/src/lib/index.js --global-name=datever --bundle --sourcemap --outfile=dist/browser/index.js && esbuild dist/module/src/lib/index.js --global-name=datever --bundle --sourcemap --minify --outfile=dist/browser/index.min.js",
     "build:parser": "shx mkdir -p dist/main/src/lib/parser && shx mkdir -p dist/module/src/lib/parser && peggy --format commonjs -o dist/main/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs && peggy --format es -o dist/main/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs",
     "build:parser:in-src": "peggy --format es -o src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs",
+    "ci:build:version": "pnpm run build && pnpm run lint && pnpm run format && pnpm run test",
+    "ci:build:publish": "pnpm run build && pnpm run test:cov && pnpm run ci:test:cov-badges && pnpm run ci:git:add-badges && pnpm run docs:readme && git add README.md && ci:git:commit-docs",
+    "ci:test:cov-badges": "pnpm run test:cov-badges && || echo \"*** WARNING: Failed to generate test badges.\"",
+    "ci:git:add-badges": "git add img/badges || echo \"*** WARNING: Ignoring badge file \\\"${badge}\\\".",
+    "ci:git:commit-docs": "pnpm run git:check-clean || git commit --message \"chore(release): update documentation and badges\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "pnpm run lint -- --fix",
     "lint:staged-noargs": "eslint --max-warnings 0",
     "format": "prettier \"src/**/*.ts\" \"test/**/*.ts\"",
-    "format:fix": "npm run format -- --write",
+    "format:fix": "pnpm run format -- --write",
     "format:staged-noargs": "prettier",
     "test": "jest",
     "test:cov": "jest --coverage --passWithNoTests",
     "test:cov-badges": "jest-coverage-badges --input coverage/coverage-summary.json --output ./img/badges",
     "test:dev": "dotenv -- jest",
-    "test:watch": "npm run test:dev -- --watch",
+    "test:watch": "pnpm run test:dev -- --watch",
     "test:debug": "dotenv -- node --inspect-brk=9230 -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "git:check-clean": "repository-check-dirty",
     "git:why": "lint-staged",
-    "git:fix": "npm run lint && npm run format",
-    "docs:readme": "doctoc --update-only --bitbucket README.md",
-    "version": "release-it",
-    "version:alpha": "release-it --preRelease=alpha",
-    "version:beta": "release-it --preRelease=beta",
-    "version:rc": "release-it --preRelease=rc",
-    "version:git": "git push --tags -u origin master",
-    "version:dry": "release-it --dry-run",
-    "release": "npm run release:npm && npm run release:git",
-    "release:npm": "npm publish",
-    "release:git": "git push --atomic --follow-tags -u origin master"
+    "docs:readme": "doctoc --update-only --bitbucket README.md"
   },
   "dependencies": {
     "tslib": "^2.3.1"

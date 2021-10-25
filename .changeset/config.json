@@ -1,0 +1,8 @@
+{
+  "access": "public",
+  "baseBranch": "master",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "flisboac/datever" }
+  ]
+}

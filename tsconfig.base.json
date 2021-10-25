@@ -1,12 +1,7 @@
 {
   "compilerOptions": {
-    "lib": [
-      "es5",
-      "es6",
-      "ES2018.AsyncIterable"
-    ],
     "allowJs": true,
-    "target": "es5",
+    "target": "es2017",
     "module": "commonjs",
     "importHelpers": true,
     "moduleResolution": "node",
