@@ -1,6 +1,7 @@
 {
   "name": "datever-workspace",
   "version": "0.0.0",
+  "license": "MIT",
   "private": true,
   "description": "Workspace for datever, a date-based version parser, inspired by semver.",
   "scripts": {
