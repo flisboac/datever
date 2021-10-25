@@ -6,6 +6,14 @@ export type DateVersionLike = string | number | Date | DateVersion;
 
 export type DateVersionComponentName = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
 
+export type DateVersionComponentMap = {
+  [K in DateVersionComponentName]: number;
+};
+
+export type DateVersionDiff = DateVersionComponentMap & {
+  distance: number;
+};
+
 const padComponent = (value: number, size: number) => String(value).padStart(size, '0');
 
 const ensureValidDate = (value: Date): Date => {
@@ -69,12 +77,16 @@ export class DateVersion {
     );
   }
 
-  toISOString() {
+  toISOString(): string {
     return this.value.toISOString();
   }
 
-  valueOf(): number {
+  toEpoch(): number {
     return this.value.getTime();
+  }
+
+  valueOf(): number {
+    return this.toEpoch();
   }
 
   toString(): string {
@@ -98,6 +110,16 @@ export class DateVersion {
       default:
         throw new DateverError(`Invalid component name "${component}".`);
     }
+  }
+
+  components(): DateVersionComponentMap {
+    const year = this.value.getUTCFullYear();
+    const month = this.value.getUTCMonth();
+    const day = this.value.getUTCDate();
+    const hour = this.value.getUTCHours();
+    const minute = this.value.getUTCMinutes();
+    const second = this.value.getUTCSeconds();
+    return { year, month, day, hour, minute, second };
   }
 
   increment(component: DateVersionComponentName, amount = 1): DateVersion {
@@ -128,6 +150,21 @@ export class DateVersion {
         throw new DateverError(`Invalid component name "${component}".`);
     }
     return new DateVersion(date);
+  }
+
+  diff(rhs: DateVersionLike): DateVersionDiff {
+    const other = DateVersion.from(rhs);
+    const distance = this.toEpoch() - other.toEpoch();
+    const lhsComponents = this.components();
+    const rhsComponents = other.components();
+    const year = lhsComponents.year - rhsComponents.year;
+    const month = lhsComponents.month - rhsComponents.month;
+    const day = lhsComponents.day - rhsComponents.day;
+    const hour = lhsComponents.hour - rhsComponents.hour;
+    const minute = lhsComponents.minute - rhsComponents.minute;
+    const second = lhsComponents.second - rhsComponents.second;
+    const diff = { distance, year, month, day, hour, minute, second };
+    return diff;
   }
 
   toDate(): Date {
