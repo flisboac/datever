@@ -58,3 +58,5 @@ local
 node_modules
 packages/*/src/lib/parser/rawParser.js
 *.tgz
+.npmrc
+.pnpm-store
