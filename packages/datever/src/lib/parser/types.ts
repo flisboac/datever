@@ -1,22 +1,6 @@
 import { DateverError } from '../common/types';
 import { SyntaxError } from './rawParser';
-
-export interface ParserPosition {
-  offset: number;
-  line: number;
-  column: number;
-}
-
-export interface ParserExpectation {
-  type: string;
-  description?: string;
-}
-
-export interface ParserLocation {
-  source: string;
-  start: ParserPosition;
-  end: ParserPosition;
-}
+import { ParserExpectation, ParserLocation } from './rawParser.types';
 
 export class DateverParserError extends DateverError {
   readonly expected?: string | ParserExpectation[] | null;

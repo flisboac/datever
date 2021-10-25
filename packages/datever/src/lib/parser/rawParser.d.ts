@@ -1,6 +1,5 @@
-import { ParserExpectation, ParserLocation } from '..';
 import { LowerBoundedRangeAnchorType, UpperBoundedRangeAnchorType } from '../common/types';
-import type { ParserExprOperator, ParserNodeType } from './rawParser.types';
+import type { ParserExpectation, ParserExprOperator, ParserLocation, ParserNodeType } from './rawParser.types';
 
 export interface BaseParserNode {
   type: ParserNodeType;

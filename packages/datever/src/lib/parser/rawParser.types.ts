@@ -1,3 +1,20 @@
+export interface ParserPosition {
+  offset: number;
+  line: number;
+  column: number;
+}
+
+export interface ParserExpectation {
+  type: string;
+  description?: string;
+}
+
+export interface ParserLocation {
+  source: string;
+  start: ParserPosition;
+  end: ParserPosition;
+}
+
 export enum ParserNodeType {
   IDENTITY_EXPR = 'IDENTITY_EXPR',
   MULTI_OPERAND_EXPR = 'MULTI_OPERAND_EXPR',
