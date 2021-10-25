@@ -14,17 +14,62 @@
     "url": "https://github.com/flisboac/datever/issues"
   },
   "bin": {
-    "datever": "dist/ts/src/cli/main.js"
+    "datever": "dist/main/src/cli/main.js"
   },
   "files": [
     "dist",
     "README.md"
   ],
+  "scripts": {
+    "ci:build:version": "pnpm run build && pnpm run lint && pnpm run format && pnpm run test",
+    "ci:build:publish": "pnpm run build && pnpm run test:cov && pnpm run ci:test:cov-badges && pnpm run ci:git:add-badges && pnpm run docs:readme && git add README.md && pnpm run ci:git:commit-docs",
+    "ci:test:cov-badges": "pnpm run test:cov-badges || echo \"*** WARNING: Failed to generate test badges.\"",
+    "ci:git:add-badges": "git add img/badges || echo \"*** WARNING: Ignoring badge file \\\"${badge}\\\".\"",
+    "ci:git:commit-docs": "pnpm run git:check-clean || git commit --message \"chore(release): update documentation and badges\"",
+    "build": "pnpm run build:main",
+    "build:main": "tsc -p tsconfig.main.json && tsconfig-replace-paths -p tsconfig.main.json -s . -o dist/ts",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "pnpm run lint -- --fix",
+    "lint:staged-noargs": "eslint --max-warnings 0",
+    "format": "pnpm run format:cli -- --check",
+    "format:cli": "prettier \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:fix": "pnpm run format:cli -- --write",
+    "format:staged-noargs": "prettier --check",
+    "test": "jest --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests --coverageReporters=\"json-summary\"",
+    "test:cov-badges": "jest-coverage-badges --input coverage/coverage-summary.json --output ./img/badges",
+    "test:dev": "dotenv -- jest",
+    "test:watch": "pnpm run test:dev -- --watch",
+    "test:debug": "dotenv -- node --inspect-brk=9230 -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "git:check-clean": "repository-check-dirty",
+    "git:why": "lint-staged",
+    "docs:readme": "doctoc --update-only --bitbucket README.md"
+  },
   "dependencies": {
     "datever": "workspace:*",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
-    "@types/node": "^16.11.4"
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.4",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "doctoc": "^2.1.0",
+    "dotenv-cli": "^4.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.3.1",
+    "jest-coverage-badges": "^1.1.2",
+    "lint-staged": "^11.2.3",
+    "prettier": "^2.4.1",
+    "repository-check-dirty": "^3.1.1",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.3.0",
+    "ts-node-dev": "^1.1.8",
+    "tsconfig-replace-paths": "0.0.5",
+    "typescript": "^4.4.4"
   }
 }

@@ -12,9 +12,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "rootDir": "./",
-    "outDir": "./dist/ts",
-    "baseUrl": ".",
     "paths": {
       "src/*": [
         "src/*"
