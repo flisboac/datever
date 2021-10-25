@@ -66,7 +66,7 @@
     "build:main": "tsc -p tsconfig.main.json && tsconfig-replace-paths -p tsconfig.main.json -s . -o dist/main",
     "build:module": "tsc -p tsconfig.module.json && tsconfig-replace-paths -p tsconfig.module.json -s . -o dist/module",
     "build:browser": "esbuild dist/module/src/lib/index.js --global-name=datever --bundle --sourcemap --outfile=dist/browser/index.js && esbuild dist/module/src/lib/index.js --global-name=datever --bundle --sourcemap --minify --outfile=dist/browser/index.min.js",
-    "build:parser": "shx mkdir -p dist/main/src/lib/parser && shx mkdir -p dist/module/src/lib/parser && peggy --format commonjs -o dist/main/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs && peggy --format es -o dist/main/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs",
+    "build:parser": "shx mkdir -p dist/main/src/lib/parser && shx mkdir -p dist/module/src/lib/parser && peggy --format commonjs -o dist/main/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs && peggy --format es -o dist/module/src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs && shx cp src/lib/parser/rawParser.d.ts dist/main/src/lib/parser/rawParser.d.ts && shx cp src/lib/parser/rawParser.d.ts dist/module/src/lib/parser/rawParser.d.ts",
     "build:parser:in-src": "peggy --format es -o src/lib/parser/rawParser.js src/lib/parser/rawParser.pegjs",
     "ci:build:version": "pnpm run build && pnpm run lint && pnpm run format && pnpm run test",
     "ci:build:publish": "pnpm run build && pnpm run test:cov && pnpm run ci:test:cov-badges && pnpm run ci:git:add-badges && pnpm run docs:readme && git add README.md && pnpm run ci:git:commit-docs",
