@@ -1,0 +1,22 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+tab_width = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[**/{package,tsconfig*}.json]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+[**.{js,ts}]
+quote_type = single
+
+[**.sql]
+# Para evitar erros em comentários SQL "vazios"
+trim_trailing_whitespace = false

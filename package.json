@@ -1,0 +1,17 @@
+{
+  "name": "datever-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Workspace for datever, a date-based version parser, inspired by semver.",
+  "scripts": {
+    "prepare": "pnpm run init:dev",
+    "init:dev": "is-ci || husky install",
+    "postinstall": "node scripts/bin/instantiate-samples.js"
+  },
+  "devDependencies": {
+    "commitlint": "^13.2.1",
+    "husky": "^7.0.2",
+    "is-ci": "^3.0.0",
+    "lint-staged": "^11.2.3"
+  }
+}

@@ -1,0 +1,13 @@
+scripts
+dist
+build
+.vscode
+.serverless
+node_modules
+.*.js
+*config.js
+yarn*
+package*.json
+tsconfig*.json
+jsconfig*.json
+src/lib/parser/rawParser.js

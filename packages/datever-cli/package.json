@@ -1,0 +1,30 @@
+{
+  "name": "datever-cli",
+  "version": "0.0.0",
+  "description": "A CLI for datever, a date-based version parser, inspired by semver.",
+  "engines": {
+    "node": "14",
+    "pnpm": "6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flisboac/datever"
+  },
+  "bugs": {
+    "url": "https://github.com/flisboac/datever/issues"
+  },
+  "bin": {
+    "datever": "dist/ts/src/cli/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "datever": "workspace:*",
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.4"
+  }
+}

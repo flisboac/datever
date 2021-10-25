@@ -1,0 +1,17 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    "irongeek.vscode-env",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode-remote.remote-wsl",
+    "smulyono.reveal",
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-typescript-next",
+    "orta.vscode-jest",
+    "eg2.vscode-npm-script",
+    "folke.vscode-monorepo-workspace"
+  ]
+}

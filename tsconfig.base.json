@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es5",
+      "es6",
+      "ES2018.AsyncIterable"
+    ],
+    "allowJs": true,
+    "target": "es5",
+    "module": "commonjs",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSourceMap": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "rootDir": "./",
+    "outDir": "./dist/ts",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [
+        "src/*"
+      ]
+    }
+  }
+}

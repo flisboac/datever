@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist/ts",
+    "baseUrl": "."
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "**/*.pegjs"
+  ],
+  "include": [
+    "src",
+    "src/**/*.js"
+  ]
+}
