@@ -1,6 +1,8 @@
+import { DateverParserError } from '..';
 import { DateverError } from '../common/types';
 import { parse } from '../parser';
 import { ParserNodeType } from '../parser/rawParser.types';
+import { DateverLogicError } from './types';
 
 export type DateVersionLike = string | number | Date | DateVersion;
 
@@ -18,7 +20,7 @@ const padComponent = (value: number, size: number) => String(value).padStart(siz
 
 const ensureValidDate = (value: Date): Date => {
   if (Number.isNaN(value.getTime())) {
-    throw new DateverError('Invalid epoch date.');
+    throw new DateverLogicError('Invalid epoch date.');
   }
   const date = new Date(value);
   date.setMilliseconds(0);
@@ -42,7 +44,7 @@ export class DateVersion {
 
     if (typeof value === 'number') {
       if (value < 0) {
-        throw new DateverError('Epoch date cannot be negative.');
+        throw new DateverLogicError('Epoch date cannot be negative.');
       }
       const date = ensureValidDate(new Date(value));
       return new DateVersion(date);
@@ -56,7 +58,7 @@ export class DateVersion {
         expr.type !== ParserNodeType.IDENTITY_EXPR ||
         expr.value.type !== ParserNodeType.VERSION
       ) {
-        throw new DateverError('String is not a version value.');
+        throw new DateverParserError('Input string is not a version value.');
       }
       const { Y, M, D, h, m, s } = expr.value;
       const date = ensureValidDate(new Date(Date.UTC(Y, M, D, h, m, s)));
