@@ -1,5 +1,11 @@
 # datever
 
+## 0.2.0
+
+### Minor Changes
+
+- [#2](https://github.com/flisboac/datever/pull/2) [`d168cf4`](https://github.com/flisboac/datever/commit/d168cf422c94e0a6a0978bc81d73a4f1abab9112) Thanks [@flisboac](https://github.com/flisboac)! - add version diffing
+
 ## 0.1.1
 
 ### Patch Changes
