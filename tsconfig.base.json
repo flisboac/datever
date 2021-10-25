@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "paths": {
       "src/*": [
-        "src/*"
+        "./src/*"
       ]
     },
     "types": ["jest"]
