@@ -1,6 +1,6 @@
 {
   "name": "datever-cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A CLI for datever, a date-based version parser, inspired by semver.",
   "engines": {
     "node": "14",
