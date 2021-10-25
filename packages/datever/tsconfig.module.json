@@ -4,5 +4,9 @@
     "module": "esnext",
     "outDir": "dist/module",
     "types": []
-  }
+  },
+  "include": [
+    "src",
+    "src/**/*.js"
+  ]
 }

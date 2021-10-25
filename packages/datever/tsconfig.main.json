@@ -4,5 +4,9 @@
     "module": "commonjs",
     "outDir": "dist/main",
     "types": []
-  }
+  },
+  "include": [
+    "src",
+    "src/**/*.js"
+  ]
 }

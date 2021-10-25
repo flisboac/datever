@@ -1,8 +1,13 @@
 {
+  "$schema": "https://unpkg.com/@changesets/config@1.6.1/schema.json",
   "access": "public",
   "baseBranch": "master",
   "changelog": [
     "@changesets/changelog-github",
     { "repo": "flisboac/datever" }
-  ]
+  ],
+  "commit": false,
+  "linked": [],
+  "updateInternalDependencies": "patch",
+  "ignore": []
 }
