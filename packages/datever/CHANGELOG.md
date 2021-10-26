@@ -1,5 +1,11 @@
 # datever
 
+## 0.3.0
+
+### Minor Changes
+
+- [#4](https://github.com/flisboac/datever/pull/4) [`1209861`](https://github.com/flisboac/datever/commit/12098616becf199d967ffaa011ce9733e038e7e3) Thanks [@flisboac](https://github.com/flisboac)! - add date version range
+
 ## 0.2.0
 
 ### Minor Changes
