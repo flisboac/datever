@@ -1,7 +1,7 @@
-import { DateverParserError } from '..';
 import { DateverError } from '../common/types';
-import { parse } from '../parser';
-import { ParserNodeType } from '../parser/rawParser.types';
+import { parse } from '../parser/functions';
+import { DateverParserError } from '../parser/types';
+import { DateVersionDuration, DateVersionDurationLike } from './duration';
 import { DateverLogicError } from './types';
 
 export type DateVersionLike = string | number | Date | DateVersion;
@@ -32,7 +32,14 @@ export class DateVersion {
 
   private constructor(public value: Date) {}
 
-  static from(value: DateVersionLike): DateVersion {
+  static from(value: DateVersionLike[]): DateVersion[];
+  static from(value: DateVersionLike): DateVersion;
+  static from(value: DateVersionLike[] | DateVersionLike): DateVersion[] | DateVersion;
+  static from(value: DateVersionLike[] | DateVersionLike): DateVersion[] | DateVersion {
+    if (Array.isArray(value)) {
+      return value.map(version => DateVersion.from(version));
+    }
+
     if (value instanceof DateVersion) {
       return value;
     }
@@ -52,12 +59,7 @@ export class DateVersion {
 
     if (typeof value === 'string') {
       const expr = parse(value);
-      if (
-        typeof expr !== 'object' ||
-        !expr ||
-        expr.type !== ParserNodeType.IDENTITY_EXPR ||
-        expr.value.type !== ParserNodeType.VERSION
-      ) {
+      if (typeof expr !== 'object' || !expr || expr.type !== 'IDENTITY_EXPR' || expr.value.type !== 'VERSION') {
         throw new DateverParserError('Input string is not a version value.');
       }
       const { Y, M, D, h, m, s } = expr.value;
@@ -66,6 +68,30 @@ export class DateVersion {
     }
 
     throw new DateverError('Invalid value type for a date version.');
+  }
+
+  static max(_versions: []): undefined;
+  static max(_versions: DateVersionLike[]): DateVersion | undefined;
+  static max(_versions: DateVersionLike[]): DateVersion | undefined {
+    return DateVersion.from(_versions).sort(DateVersion.compare).pop();
+  }
+
+  static min(_versions: []): undefined;
+  static min(_versions: DateVersionLike[]): DateVersion | undefined;
+  static min(_versions: DateVersionLike[]): DateVersion | undefined {
+    return DateVersion.from(_versions).sort(DateVersion.rcompare).pop();
+  }
+
+  static compare(lhs: DateVersionLike, rhs: DateVersionLike): number {
+    return DateVersion.from(lhs).compare(rhs);
+  }
+
+  static rcompare(lhs: DateVersionLike, rhs: DateVersionLike): number {
+    return DateVersion.from(rhs).compare(lhs);
+  }
+
+  stringify(): string {
+    return this.toISOString();
   }
 
   slugify(): string {
@@ -154,6 +180,10 @@ export class DateVersion {
     return new DateVersion(date);
   }
 
+  decrement(component: DateVersionComponentName, amount = 1): DateVersion {
+    return this.increment(component, -amount);
+  }
+
   diff(rhs: DateVersionLike): DateVersionDiff {
     const other = DateVersion.from(rhs);
     const distance = this.toEpoch() - other.toEpoch();
@@ -167,6 +197,30 @@ export class DateVersion {
     const second = lhsComponents.second - rhsComponents.second;
     const diff = { distance, year, month, day, hour, minute, second };
     return diff;
+  }
+
+  addDuration(_duration: DateVersionDurationLike): DateVersion {
+    const duration = DateVersionDuration.from(_duration);
+    const date = this.toDate();
+    date.setUTCFullYear(date.getUTCFullYear() + duration.year);
+    date.setUTCMonth(date.getUTCMonth() + duration.month);
+    date.setUTCDate(date.getUTCDate() + duration.day);
+    date.setUTCHours(date.getUTCHours() + duration.hour);
+    date.setUTCMinutes(date.getUTCMinutes() + duration.month);
+    date.setUTCSeconds(date.getUTCSeconds() + duration.second);
+    return new DateVersion(date);
+  }
+
+  minusDuration(_duration: DateVersionDurationLike): DateVersion {
+    const duration = DateVersionDuration.from(_duration);
+    const date = this.toDate();
+    date.setUTCFullYear(date.getUTCFullYear() - duration.year);
+    date.setUTCMonth(date.getUTCMonth() - duration.month);
+    date.setUTCDate(date.getUTCDate() - duration.day);
+    date.setUTCHours(date.getUTCHours() - duration.hour);
+    date.setUTCMinutes(date.getUTCMinutes() - duration.month);
+    date.setUTCSeconds(date.getUTCSeconds() - duration.second);
+    return new DateVersion(date);
   }
 
   toDate(): Date {

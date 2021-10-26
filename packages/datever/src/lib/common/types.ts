@@ -1,12 +1,5 @@
-export enum LowerBoundedRangeAnchorType {
-  GT = 'GT',
-  GE = 'GE',
-}
-
-export enum UpperBoundedRangeAnchorType {
-  LT = 'LT',
-  LE = 'LE',
-}
+export type LowerBoundedRangeAnchorType = 'GT' | 'GE';
+export type UpperBoundedRangeAnchorType = 'LT' | 'LE';
 
 export class DateverError extends Error {
   readonly cause?: any;
