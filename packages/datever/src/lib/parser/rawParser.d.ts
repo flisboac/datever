@@ -6,18 +6,18 @@ export interface BaseParserNode {
 }
 
 export interface IdentityExprNode extends BaseParserNode {
-  type: ParserNodeType.IDENTITY_EXPR;
+  type: 'IDENTITY_EXPR';
   value: ValueExprNode;
 }
 
 export interface MultiOperandExprNode extends BaseParserNode {
-  type: ParserNodeType.MULTI_OPERAND_EXPR;
+  type: 'MULTI_OPERAND_EXPR';
   operator: ParserExprOperator;
   operands: Array<ValueExprNode>;
 }
 
 export interface DurationValueNode extends BaseParserNode {
-  type: ParserNodeType.DURATION;
+  type: 'DURATION';
   Y?: number | null;
   M?: number | null;
   D?: number | null;
@@ -27,7 +27,7 @@ export interface DurationValueNode extends BaseParserNode {
 }
 
 export interface VersionValueNode extends BaseParserNode {
-  type: ParserNodeType.VERSION;
+  type: 'VERSION';
   Y: number;
   M: number;
   D: number;
@@ -38,25 +38,25 @@ export interface VersionValueNode extends BaseParserNode {
 }
 
 export interface YearRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.YEAR_RANGE;
+  type: 'YEAR_RANGE';
   Y: number;
 }
 
 export interface MonthRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.MONTH_RANGE;
+  type: 'MONTH_RANGE';
   Y: number;
   M: number;
 }
 
 export interface DayRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.DAY_RANGE;
+  type: 'DAY_RANGE';
   Y: number;
   M: number;
   D: number;
 }
 
 export interface HourRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.HOUR_RANGE;
+  type: 'HOUR_RANGE';
   Y: number;
   M: number;
   D: number;
@@ -64,7 +64,7 @@ export interface HourRangeValueNode extends BaseParserNode {
 }
 
 export interface MinuteRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.MINUTE_RANGE;
+  type: 'MINUTE_RANGE';
   Y: number;
   M: number;
   D: number;
@@ -81,31 +81,31 @@ export type BriefRangeValueNode =
   | MinuteRangeValueNode;
 
 export interface CloseBoundedRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.CLOSE_BOUNDED_RANGE;
-  lower: BriefRangeValueNode;
-  upper: BriefRangeValueNode;
+  type: 'FULLY_BOUNDED_RANGE';
+  lower: LowerBoundedRangeValueNode;
+  upper: UpperBoundedRangeValueNode;
 }
 
 export interface LowerBoundedRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.LOWER_BOUNDED_RANGE;
+  type: 'LOWER_BOUNDED_RANGE';
   lower: BriefRangeValueNode;
   anchor: LowerBoundedRangeAnchorType;
 }
 
 export interface UpperBoundedRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.UPPER_BOUNDED_RANGE;
+  type: 'UPPER_BOUNDED_RANGE';
   upper: BriefRangeValueNode;
   anchor: UpperBoundedRangeAnchorType;
 }
 
 export interface LowerDurationRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.LOWER_DURATION_RANGE;
+  type: 'LOWER_DURATION_RANGE';
   lower: BriefRangeValueNode;
   duration: DurationValueNode;
 }
 
 export interface UpperDurationRangeValueNode extends BaseParserNode {
-  type: ParserNodeType.UPPER_DURATION_RANGE;
+  type: 'UPPER_DURATION_RANGE';
   upper: BriefRangeValueNode;
   duration: DurationValueNode;
 }
@@ -119,7 +119,7 @@ export type DetailedRangeValueNode =
 
 export type ConstantExprNode = VersionValueNode;
 export type RangeExprNode = BriefRangeValueNode | DetailedRangeValueNode;
-export type ValueExprNode = ConstantExprNode | RangeExprNode;
+export type ValueExprNode = ConstantExprNode | RangeExprNode | DurationValueNode;
 
 export type OperationExprNode = IdentityExprNode | MultiOperandExprNode;
 

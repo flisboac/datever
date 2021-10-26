@@ -1,6 +1,6 @@
 Expression = expr:( BinaryExpression / UnitExpression ) { return expr; }
 
-UnitExpression = _? value:VersionOrRange _? {
+UnitExpression = _? value:(VersionOrRange / Duration) _? {
 	return { type: 'IDENTITY_EXPR', value };
 }
 
@@ -33,8 +33,8 @@ LowerUpperRange = IsoFormatBoundedRange / CloseBoundRange / IsoFormatBoundedRang
 
 LowerBoundRange = anchor:LowerBoundOp _? lower:BoundedRangePart { return { anchor, lower, type: 'LOWER_BOUNDED_RANGE' }; }
 UpperBoundRange = anchor:UpperBoundOp _? upper:BoundedRangePart { return { anchor, upper, type: 'UPPER_BOUNDED_RANGE' }; }
-CloseBoundRange = lower:LowerBoundRange _? upper:UpperBoundRange { return { lower, upper, type: 'CLOSE_BOUNDED_RANGE' }; }
-IsoFormatBoundedRange = lower:BoundedRangePart _? IsoTimeIntervalSep _? upper:BoundedRangePart { return { lower, upper, type: 'CLOSE_BOUNDED_RANGE' }; }
+CloseBoundRange = lower:LowerBoundRange _? upper:UpperBoundRange { return { lower, upper, type: 'FULLY_BOUNDED_RANGE' }; }
+IsoFormatBoundedRange = lower:BoundedRangePart _? IsoTimeIntervalSep _? upper:BoundedRangePart { return { lower, upper, type: 'FULLY_BOUNDED_RANGE' }; }
 LowerIsoBoundedRange = lower:BoundedRangePart _? IsoTimeIntervalSep _? duration:Duration { return { lower, duration, type: 'LOWER_DURATION_RANGE' }; }
 UpperIsoBoundedRange = duration:Duration _? IsoTimeIntervalSep _? upper:BoundedRangePart { return { upper, duration, type: 'UPPER_DURATION_RANGE' }; }
 
