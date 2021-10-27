@@ -1,6 +1,6 @@
 import { DateverParserError } from '..';
 import { parse } from '../parser/functions';
-import { ValueExprNode } from '../parser/rawParser';
+import { IdentityExprNode, ValueExprNode } from '../parser/rawParser';
 import { lastSatisfying } from '../utils/objects';
 import { DateVersionRange } from './range';
 import { DateverLogicError } from './types';
@@ -13,7 +13,7 @@ export interface DateVersionSpecProps {
   ranges: DateVersionRange[];
 }
 
-const extractRange = (expr: ValueExprNode): DateVersionRange => {
+const extractRange = (expr: IdentityExprNode | ValueExprNode): DateVersionRange => {
   const { lower, upper } = extractBriefVersionRangeAnchorsData(expr);
   return DateVersionRange.from({ lower, upper });
 };

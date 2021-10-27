@@ -2,7 +2,6 @@ import { DateverError } from '../common/types';
 import { parse } from '../parser/functions';
 import { ValueExprNode } from '../parser/rawParser';
 import { DateverParserError } from '../parser/types';
-import { compare } from '../utils/numbers';
 import { lastSatisfying } from '../utils/objects';
 import { DateverLogicError } from './types';
 import { extractBriefVersionRangeAnchorsData } from './utils';
@@ -50,8 +49,8 @@ export class DateVersionRangeAnchor {
 const createBriefVersionAnchors = (expr: ValueExprNode): Pick<DateVersionRange, 'lower' | 'upper'> => {
   const { lower, upper } = extractBriefVersionRangeAnchorsData(expr);
   return {
-    lower: DateVersionRangeAnchor.from(lower),
-    upper: DateVersionRangeAnchor.from(upper),
+    lower: lower ? DateVersionRangeAnchor.from(lower) : undefined,
+    upper: upper ? DateVersionRangeAnchor.from(upper) : undefined,
   };
 };
 
@@ -237,8 +236,7 @@ export class DateVersionRange {
   /**
    * Orders two ranges, in ascending order.
    *
-   * Ordering is done as in interval arithmetic, with the addition of minimum version comparison
-   * if two open ranges eventually compare equal -- in which case, open-endedness compares less.
+   * Ordering is done as in interval arithmetic.
    *
    * @TODO Determine if ordering is total or partial (will need to evaluate the implications of each)
    * @param _rhs The range-like to compare.
@@ -248,15 +246,13 @@ export class DateVersionRange {
     const rhs = DateVersionRange.from(_rhs);
     const comesBefore = this._maxEpoch < rhs._minEpoch;
     const comesAfter = rhs._maxEpoch < this._minEpoch;
-    const cmp = Number(comesAfter) - Number(comesBefore);
-    return cmp || compare(this._minEpoch, rhs._minEpoch);
+    return Number(comesBefore) - Number(comesAfter);
   }
 
   /**
    * Orders two ranges, in descending order.
    *
-   * Ordering is done as in interval arithmetic, with the addition of minimum version comparison
-   * if two open ranges eventually compare equal -- in which case, open-endedness compares less.
+   * Ordering is done as in interval arithmetic.
    *
    * @TODO Determine if ordering is total or partial (will need to evaluate the implications of each)
    * @param _rhs The range-like to compare.
@@ -264,10 +260,9 @@ export class DateVersionRange {
    */
   rcompare(_rhs: DateVersionRangeLike): number {
     const rhs = DateVersionRange.from(_rhs);
-    const isBefore = this._maxEpoch < rhs._minEpoch;
-    const isAfter = rhs._maxEpoch < this._minEpoch;
-    const cmp = Number(isBefore) - Number(isAfter);
-    return cmp || compare(this._maxEpoch, rhs._maxEpoch);
+    const comesBefore = this._maxEpoch < rhs._minEpoch;
+    const comesAfter = rhs._maxEpoch < this._minEpoch;
+    return Number(comesAfter) - Number(comesBefore);
   }
 
   /**
@@ -283,7 +278,9 @@ export class DateVersionRange {
    */
   includes(_rhs: DateVersionRangeLike): boolean {
     const rhs = DateVersionRange.from(_rhs);
-    return this._minEpoch >= rhs._minEpoch && this._maxEpoch <= rhs._maxEpoch;
+    const fitsLower = rhs._minEpoch >= this._minEpoch;
+    const fitsUpper = rhs._maxEpoch <= this._maxEpoch;
+    return fitsLower && fitsUpper;
   }
 
   /**
