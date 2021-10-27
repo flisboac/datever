@@ -1,0 +1,18 @@
+name: Auto-assign projects to issues
+
+on:
+  issues:
+    types: [opened]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  assign_to_project:
+    runs-on: ubuntu-latest
+    name: Auto-assign projects to issues
+    steps:
+    - name: Auto-assign the default project to all issues
+      uses: srggrs/assign-one-project-github-action@1.2.0
+      with:
+        project: 'https://github.com/flisboac/datever/projects/4'
+        column_name: 'Needs triage'
