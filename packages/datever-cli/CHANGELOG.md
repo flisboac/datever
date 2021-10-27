@@ -1,5 +1,12 @@
 # datever-cli
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`bcebb0d`](https://github.com/flisboac/datever/commit/bcebb0d469e161061c16071a84d15d2310cd0556), [`824d01a`](https://github.com/flisboac/datever/commit/824d01aead3a28691186b9f03a0c95307246c7f7)]:
+  - datever@0.5.0
+
 ## 0.1.4
 
 ### Patch Changes

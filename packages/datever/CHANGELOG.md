@@ -1,5 +1,15 @@
 # datever
 
+## 0.5.0
+
+### Minor Changes
+
+- [#11](https://github.com/flisboac/datever/pull/11) [`824d01a`](https://github.com/flisboac/datever/commit/824d01aead3a28691186b9f03a0c95307246c7f7) Thanks [@flisboac](https://github.com/flisboac)! - implement date version specification
+
+### Patch Changes
+
+- [#13](https://github.com/flisboac/datever/pull/13) [`bcebb0d`](https://github.com/flisboac/datever/commit/bcebb0d469e161061c16071a84d15d2310cd0556) Thanks [@flisboac](https://github.com/flisboac)! - compare versions and ranges correctly
+
 ## 0.4.0
 
 ### Minor Changes
