@@ -4,6 +4,15 @@ import { DateverParserError } from '../parser/types';
 
 export type DateVersionDurationLike = string | DateVersionDuration | Partial<DateVersionDuration>;
 
+export interface DateVersionDurationProps {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
 export class DateVersionDuration {
   readonly year: number = 0;
   readonly month: number = 0;
@@ -12,7 +21,7 @@ export class DateVersionDuration {
   readonly minute: number = 0;
   readonly second: number = 0;
 
-  private constructor(data?: DateVersionDuration) {
+  private constructor(data?: DateVersionDurationProps) {
     if (data) {
       this.year = data.year || 0;
       this.month = data.month || 0;
