@@ -152,39 +152,17 @@ export class DateVersion {
   }
 
   increment(component: DateVersionComponentName | 'lowest' | 'highest', amount = 1): DateVersion {
-    const date = this.toDate();
     if (amount <= 0) {
       throw new DateverError('Increment amount must be greater than zero.');
     }
-    switch (component) {
-      case 'highest':
-      case 'year':
-        date.setUTCFullYear(date.getUTCFullYear() + amount);
-        break;
-      case 'month':
-        date.setUTCMonth(date.getUTCMonth() + amount);
-        break;
-      case 'day':
-        date.setUTCDate(date.getUTCDate() + amount);
-        break;
-      case 'hour':
-        date.setUTCHours(date.getUTCHours() + amount);
-        break;
-      case 'minute':
-        date.setUTCMinutes(date.getUTCMinutes() + amount);
-        break;
-      case 'second':
-      case 'lowest':
-        date.setUTCSeconds(date.getUTCSeconds() + amount);
-        break;
-      default:
-        throw new DateverError(`Invalid component name "${component}".`);
-    }
-    return new DateVersion(date);
+    return this._increment(component, amount);
   }
 
   decrement(component: DateVersionComponentName | 'lowest' | 'highest', amount = 1): DateVersion {
-    return this.increment(component, -amount);
+    if (amount <= 0) {
+      throw new DateverError('Decrement amount must be greater than zero.');
+    }
+    return this._increment(component, -amount);
   }
 
   diff(rhs: DateVersionLike): DateVersionDiff {
@@ -238,5 +216,34 @@ export class DateVersion {
   rcompare(_rhs: DateVersionLike): number {
     const rhs = DateVersion.from(_rhs);
     return compare(rhs.toEpoch(), this.toEpoch());
+  }
+
+  private _increment(component: DateVersionComponentName | 'lowest' | 'highest', amount = 1): DateVersion {
+    const date = this.toDate();
+    switch (component) {
+      case 'highest':
+      case 'year':
+        date.setUTCFullYear(date.getUTCFullYear() + amount);
+        break;
+      case 'month':
+        date.setUTCMonth(date.getUTCMonth() + amount);
+        break;
+      case 'day':
+        date.setUTCDate(date.getUTCDate() + amount);
+        break;
+      case 'hour':
+        date.setUTCHours(date.getUTCHours() + amount);
+        break;
+      case 'minute':
+        date.setUTCMinutes(date.getUTCMinutes() + amount);
+        break;
+      case 'second':
+      case 'lowest':
+        date.setUTCSeconds(date.getUTCSeconds() + amount);
+        break;
+      default:
+        throw new DateverError(`Invalid component name "${component}".`);
+    }
+    return new DateVersion(date);
   }
 }
