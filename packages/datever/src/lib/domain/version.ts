@@ -1,6 +1,7 @@
 import { DateverError } from '../common/types';
 import { parse } from '../parser/functions';
 import { DateverParserError } from '../parser/types';
+import { compare } from '../utils/numbers';
 import { DateVersionDuration, DateVersionDurationLike } from './duration';
 import { DateverLogicError } from './types';
 
@@ -150,12 +151,13 @@ export class DateVersion {
     return { year, month, day, hour, minute, second };
   }
 
-  increment(component: DateVersionComponentName, amount = 1): DateVersion {
+  increment(component: DateVersionComponentName | 'lowest' | 'highest', amount = 1): DateVersion {
     const date = this.toDate();
     if (amount <= 0) {
       throw new DateverError('Increment amount must be greater than zero.');
     }
     switch (component) {
+      case 'highest':
       case 'year':
         date.setUTCFullYear(date.getUTCFullYear() + amount);
         break;
@@ -172,6 +174,7 @@ export class DateVersion {
         date.setUTCMinutes(date.getUTCMinutes() + amount);
         break;
       case 'second':
+      case 'lowest':
         date.setUTCSeconds(date.getUTCSeconds() + amount);
         break;
       default:
@@ -180,7 +183,7 @@ export class DateVersion {
     return new DateVersion(date);
   }
 
-  decrement(component: DateVersionComponentName, amount = 1): DateVersion {
+  decrement(component: DateVersionComponentName | 'lowest' | 'highest', amount = 1): DateVersion {
     return this.increment(component, -amount);
   }
 
@@ -229,6 +232,11 @@ export class DateVersion {
 
   compare(_rhs: DateVersionLike): number {
     const rhs = DateVersion.from(_rhs);
-    return Number(this.value > rhs.value) - Number(rhs.value > this.value);
+    return compare(this.toEpoch(), rhs.toEpoch());
+  }
+
+  rcompare(_rhs: DateVersionLike): number {
+    const rhs = DateVersion.from(_rhs);
+    return compare(rhs.toEpoch(), this.toEpoch());
   }
 }
