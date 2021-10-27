@@ -79,7 +79,7 @@ MonthPart "integer" = Digit Digit {
     if (value <= 0 || value > 12) {
     	throw new Error('Month must be between 1 and 12.');
     }
-    return value - 1;
+    return value;
 }
 DayPart "integer" = Digit Digit {
 	const value = parseInt(text());

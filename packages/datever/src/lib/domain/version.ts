@@ -4,6 +4,7 @@ import { DateverParserError } from '../parser/types';
 import { compare } from '../utils/numbers';
 import { DateVersionDuration, DateVersionDurationLike } from './duration';
 import { DateverLogicError } from './types';
+import { extractEpoch } from './utils';
 
 export type DateVersionLike = string | number | Date | DateVersion;
 
@@ -51,9 +52,6 @@ export class DateVersion {
     }
 
     if (typeof value === 'number') {
-      if (value < 0) {
-        throw new DateverLogicError('Epoch date cannot be negative.');
-      }
       const date = ensureValidDate(new Date(value));
       return new DateVersion(date);
     }
@@ -63,8 +61,8 @@ export class DateVersion {
       if (typeof expr !== 'object' || !expr || expr.type !== 'IDENTITY_EXPR' || expr.value.type !== 'VERSION') {
         throw new DateverParserError('Input string is not a version value.');
       }
-      const { Y, M, D, h, m, s } = expr.value;
-      const date = ensureValidDate(new Date(Date.UTC(Y, M, D, h, m, s)));
+      const epoch = extractEpoch(expr.value);
+      const date = ensureValidDate(new Date(epoch));
       return new DateVersion(date);
     }
 

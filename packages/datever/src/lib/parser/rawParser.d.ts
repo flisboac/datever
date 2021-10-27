@@ -13,7 +13,7 @@ export interface IdentityExprNode extends BaseParserNode {
 export interface MultiOperandExprNode extends BaseParserNode {
   type: 'MULTI_OPERAND_EXPR';
   operator: ParserExprOperator;
-  operands: Array<ValueExprNode>;
+  operands: Array<IdentityExprNode | ValueExprNode>;
 }
 
 export interface DurationValueNode extends BaseParserNode {
