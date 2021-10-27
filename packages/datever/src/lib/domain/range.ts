@@ -1,10 +1,11 @@
 import { DateverError } from '../common/types';
 import { parse } from '../parser/functions';
-import { BriefRangeValueNode, ConstantExprNode, DurationValueNode } from '../parser/rawParser';
+import { ValueExprNode } from '../parser/rawParser';
 import { DateverParserError } from '../parser/types';
 import { compare } from '../utils/numbers';
-import { DateVersionDuration } from './duration';
+import { lastSatisfying } from '../utils/objects';
 import { DateverLogicError } from './types';
+import { extractBriefVersionRangeAnchorsData } from './utils';
 import { DateVersion, DateVersionLike } from './version';
 
 export type DateVersionRangeLike = string | DateVersionLike | DateVersionRange | DateVersionRangeProps;
@@ -46,92 +47,12 @@ export class DateVersionRangeAnchor {
   }
 }
 
-const openOperators = ['GT', 'LT'];
-
-const createBriefVersionAnchors = (
-  expr: ConstantExprNode | BriefRangeValueNode,
-): Pick<DateVersionRange, 'lower' | 'upper'> => {
-  let lower: DateVersionRangeAnchor;
-  let upper: DateVersionRangeAnchor;
-
-  switch (expr.type) {
-    case 'VERSION':
-      const value = DateVersion.from(new Date(Date.UTC(expr.Y, expr.M, expr.D, expr.h, expr.m, expr.s)));
-      lower = DateVersionRangeAnchor.from({ version: value, open: false });
-      upper = DateVersionRangeAnchor.from({ version: value, open: false });
-      break;
-
-    case 'YEAR_RANGE':
-      lower = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, 0, 1, 0, 0, 0))),
-        open: false,
-      });
-      upper = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, 11, 31, 23, 59, 59))),
-        open: false,
-      });
-      break;
-
-    case 'MONTH_RANGE':
-      lower = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, 1, 0, 0, 0))),
-        open: false,
-      });
-      upper = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, 31, 23, 59, 59))),
-        open: false,
-      });
-      break;
-
-    case 'DAY_RANGE':
-      lower = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, 0, 0, 0))),
-        open: false,
-      });
-      upper = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, 23, 59, 59))),
-        open: false,
-      });
-      break;
-
-    case 'HOUR_RANGE':
-      lower = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, expr.h, 0, 0))),
-        open: false,
-      });
-      upper = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, expr.h, 59, 59))),
-        open: false,
-      });
-      break;
-
-    case 'MINUTE_RANGE':
-      lower = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, expr.h, expr.m, 0))),
-        open: false,
-      });
-      upper = DateVersionRangeAnchor.from({
-        version: DateVersion.from(new Date(Date.UTC(expr.Y, expr.M + 1, expr.D, expr.h, expr.m, 59))),
-        open: false,
-      });
-      break;
-
-    default:
-      throw new DateverParserError('Input string is not a version value.');
-  }
-
-  return { lower, upper };
-};
-
-const createDuration = (value: DurationValueNode): DateVersionDuration => {
-  return DateVersionDuration.from({
-    year: value.Y,
-    month: value.M,
-    day: value.D,
-    hour: value.h,
-    minute: value.m,
-    second: value.s,
-  });
+const createBriefVersionAnchors = (expr: ValueExprNode): Pick<DateVersionRange, 'lower' | 'upper'> => {
+  const { lower, upper } = extractBriefVersionRangeAnchorsData(expr);
+  return {
+    lower: DateVersionRangeAnchor.from(lower),
+    upper: DateVersionRangeAnchor.from(upper),
+  };
 };
 
 export class DateVersionRange {
@@ -211,85 +132,9 @@ export class DateVersionRange {
         throw new DateverParserError('Input string is not a version value.');
       }
 
-      let lower: DateVersionRangeAnchor;
-      let upper: DateVersionRangeAnchor;
-
-      switch (expr.value.type) {
-        case 'VERSION':
-        case 'YEAR_RANGE':
-        case 'MONTH_RANGE':
-        case 'DAY_RANGE':
-        case 'HOUR_RANGE':
-        case 'MINUTE_RANGE':
-          {
-            const limits = createBriefVersionAnchors(expr.value);
-            lower = limits.lower;
-            upper = limits.upper;
-          }
-          break;
-
-        case 'FULLY_BOUNDED_RANGE':
-          {
-            lower = DateVersionRangeAnchor.from({
-              version: createBriefVersionAnchors(expr.value.lower.lower).lower.version,
-              open: openOperators.includes(expr.value.lower.anchor),
-            });
-            upper = DateVersionRangeAnchor.from({
-              version: createBriefVersionAnchors(expr.value.upper.upper).upper.version,
-              open: openOperators.includes(expr.value.upper.anchor),
-            });
-          }
-          break;
-
-        case 'LOWER_BOUNDED_RANGE':
-          {
-            const open = openOperators.includes(expr.value.anchor);
-            const limits = createBriefVersionAnchors(expr.value.lower);
-            const value = open
-              ? //  e.g. ">  2020"  ===  ">  2020-12-31T23:59:59"   ( internally, ">=  2021-01-01T00:00:00" )
-                limits.upper.version
-              : //  e.g. ">= 2020"  ===  ">= 2020-01-01T00:00:00"
-                limits.lower.version;
-            lower = DateVersionRangeAnchor.from({ version: value, open: open });
-          }
-          break;
-
-        case 'UPPER_BOUNDED_RANGE':
-          {
-            const open = openOperators.includes(expr.value.anchor);
-            const limits = createBriefVersionAnchors(expr.value.upper);
-            const value = open
-              ? //  e.g. "<  2020"  ===  "<  2020-01-01T00:00:00"  ( internally, "<=  2019-12-31T23:59:59" )
-                limits.lower.version
-              : //  e.g. "<= 2020"  ===  "<= 2020-12-31T23:59:59"
-                limits.upper.version;
-            upper = DateVersionRangeAnchor.from({ version: value, open: open });
-          }
-          break;
-
-        case 'LOWER_DURATION_RANGE':
-          {
-            const limits = createBriefVersionAnchors(expr.value.lower);
-            const duration = createDuration(expr.value.duration);
-            const value = lower.version.addDuration(duration);
-            lower = limits.lower;
-            upper = DateVersionRangeAnchor.from({ version: value, open: false });
-          }
-          break;
-
-        case 'UPPER_DURATION_RANGE':
-          {
-            const limits = createBriefVersionAnchors(expr.value.upper);
-            const duration = createDuration(expr.value.duration);
-            const value = upper.version.minusDuration(duration);
-            upper = limits.upper;
-            lower = DateVersionRangeAnchor.from({ version: value, open: false });
-          }
-          break;
-
-        default:
-          throw new DateverParserError('Input string is not a version value.');
-      }
+      const limits = createBriefVersionAnchors(expr.value);
+      const lower = limits.lower;
+      const upper = limits.upper;
 
       range = new DateVersionRange({ lower, upper });
     }
@@ -502,7 +347,7 @@ export class DateVersionRange {
    * @returns The greatest version that satisfies the range, or `undefined` if `_versions` is empty.
    */
   maxSatisfying(_versions: DateVersionLike[] | Iterator<DateVersionLike>): DateVersion | undefined {
-    return this._lastSatisfying(_versions, DateVersion.max);
+    return lastSatisfying(_versions, version => this.includes(version), DateVersion.max);
   }
 
   /**
@@ -512,22 +357,6 @@ export class DateVersionRange {
    * @returns The lowest version that satisfies the range, or `undefined` if `_versions` is empty.
    */
   minSatisfying(_versions: DateVersionLike[] | Iterator<DateVersionLike>): DateVersion | undefined {
-    return this._lastSatisfying(_versions, DateVersion.min);
-  }
-
-  private _lastSatisfying(
-    versions: DateVersionLike[] | Iterator<DateVersionLike>,
-    compare: (values: DateVersion[]) => DateVersion,
-  ): DateVersion | undefined {
-    versions = Array.isArray(versions) ? versions[Symbol.iterator]() : versions;
-    let result: DateVersion | undefined;
-
-    for (let next = versions.next(); !next.done; next = versions.next()) {
-      if (this.includes(next.value)) {
-        result = result ? compare([result, next.value]) : next.value;
-      }
-    }
-
-    return result;
+    return lastSatisfying(_versions, version => this.includes(version), DateVersion.min);
   }
 }
