@@ -1,5 +1,17 @@
 # datever
 
+## 0.4.0
+
+### Minor Changes
+
+- [#7](https://github.com/flisboac/datever/pull/7) [`98f8dec`](https://github.com/flisboac/datever/commit/98f8dec92006f725bb536e5d8a074077d49b4da3) Thanks [@flisboac](https://github.com/flisboac)! - implement range as an integer interval
+
+### Patch Changes
+
+- [#10](https://github.com/flisboac/datever/pull/10) [`db43de1`](https://github.com/flisboac/datever/commit/db43de1e88ceef11c39d666f45fa2e691b3a83cd) Thanks [@flisboac](https://github.com/flisboac)! - domain/version: decouple decrement method from increment's implementation
+
+* [#9](https://github.com/flisboac/datever/pull/9) [`0913636`](https://github.com/flisboac/datever/commit/0913636682b8b2cc522ef0cfdac53a8dc6240e0c) Thanks [@flisboac](https://github.com/flisboac)! - compare versions in ascending order
+
 ## 0.3.0
 
 ### Minor Changes
